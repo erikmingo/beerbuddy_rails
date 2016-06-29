@@ -58,18 +58,28 @@ require 'beer_client'
 namespace :seeding do
   desc "wtf"
   task :breweries => :environment do
-    breweries = BeerClient.new.all_verified_breweries
+    client = BeerClient.new
+    breweries = client.all_verified_breweries
     breweries.each do |brewery|
-      Brewery.create!(name: brewery.name,
-                     api_id: brewery.id,
-                     website: brewery.website,
-                     established: brewery.established,
+      new_brewery = Brewery.new(name:          brewery.name,
+                     api_id:         brewery.id,
+                     website:        brewery.website,
+                     established:    brewery.established,
                      street_address: brewery.locations.first["street_address"],
-                     locality: brewery.locality,
-                     region: brewery.region,
-                     latitude: brewery.locations.first["latitude"],
-                     longitude: brewery.locations.first["longitude"],
+                     locality:       brewery.locations.first["locality"],
+                     region:         brewery.locations.first["region"],
+                     latitude:       brewery.locations.first["latitude"],
+                     longitude:      brewery.locations.first["longitude"],
+                     postal_code:    brewery.locations.first["postal_code"],
+                     phone:          brewery.locations.first["phone"]
                      )
+      if new_brewery.valid?
+        beers = client.breweries_beers(new_brewery.api_id)
+        beers.each do |beer|
+
+        end
+        binding.pry
+      end
     end
   end
 end
